@@ -1,0 +1,45 @@
+<div class="relative flex flex-col items-start p-4 mt-3 bg-{{selectedColor}}-100 rounded-lg bg-opacity-90 group hover:bg-opacity-100"
+    draggable="true">
+    <button (click)="onClose()"
+        class="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
+        <svg  width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="feather feather-x w-4 h-4 fill-current">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+
+    </button>
+    <span
+        class="flex items-center h-6 pl-3 pr-1 text-xs font-semibold text-black-500 bg-{{ selectedColor }}-200 rounded-full">
+        <input maxlength="40" [(ngModel)]="typeInput" autoSizeInput (focus)="onFocus($event)" (blur)="onBlur($event)"
+            class="appearance-none bg-transparent border-none focus:outline-none text-black-500 font-semibold"
+            id="task-type" type="text" placeholder="Category" autocomplete="off">
+
+
+        <div [tippy]="tpl" [className]="'tippyclass'" variation="popper" placement="right"
+            class="ml-2 bg-{{ selectedColor }}-500 rounded-full border-2 border-white flex p-2 relative my-1">
+        </div>
+
+        <ng-template #tpl let-hide>
+            <color-github triangle="hide" (onChange)="handleColorChange($event)" [colors]="colorslist"></color-github>
+        </ng-template>
+
+
+    </span>
+
+
+    <div *ngIf="isColorSelectorOn" class="absolute z-40 mt-8 mt">
+        <color-github (onChange)="handleColorChange($event)" [colors]="colorslist"></color-github>
+    </div>
+
+    <textarea #myInput [(ngModel)]="taskInput" wrap="hard" (keyup)="autoGrowTextZone($event)"
+        class="mt-3 w-full text-sm font-medium appearance-none bg-transparent border-none focus:outline-none"
+        id="task-task" rows="2" type="text" placeholder="Write your task here..." autocomplete="off"></textarea>
+
+    <button (click)="addNewTask()"
+        class="text-xs font-semibold mt-4 w-full bg-white tracking-wide font-bold rounded border-b-2 border-{{ selectedColor }}-500 hover:border-{{ selectedColor }}-600 bg-{{ selectedColor }}-500 text-white shadow-md py-1 inline-flex items-center">
+        <span class="mx-auto">+ Add New Task</span>
+    </button>
+
+</div>

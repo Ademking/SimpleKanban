@@ -1,0 +1,50 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import '~tippy.js/dist/tippy.css';
+@import '~tippy.js/themes/light.css';
+@import '~tippy.js/animations/scale.css';
+
+// fix toast success icon
+.hot-toast-checkmark-icon::after {
+    border-right: white 2px solid !important;
+}
+
+// .tippy-content{
+//     padding: 0;
+// }
+
+
+.tippyclass>.tippy-box>.tippy-content {
+    padding: 0px !important;
+}
+
+.github-picker {
+    border    : none !important;
+    box-shadow: none !important;
+    opacity   : 0.3 !important;
+}
+
+* {
+    font-family: SFMono-Regular, Menlo, Monaco,
+        Consolas, "Liberation Mono",
+        "Courier New", monospace;
+}
+
+
+.overlayscroll {
+    overflow: overlay;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+    background: #fff;
+    padding   : 1em 1em 0em 1em
+}
+
+#intro-label {
+    font-weight: bold;
+}
+
+.shepherd-element {
+    max-width: 500px;
+}

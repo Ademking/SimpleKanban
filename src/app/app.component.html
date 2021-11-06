@@ -1,0 +1,210 @@
+<div @fadeOut *ngIf="showLoading" class="loading-spinner overflow-hidden absolute">
+  <div class="grid place-items-center content-center h-screen overflow-hidden w-screen">
+    <div>
+      <img src="assets/icons/icon-512x512.png" class="w-20" alt="" srcset="">
+    </div>
+    <div class="pt-3 text-center">
+      <svg fill='none' class="w-10 h-10 animate-spin" viewBox="0 0 32 32" xmlns='http://www.w3.org/2000/svg'>
+        <path clip-rule='evenodd'
+          d='M15.165 8.53a.5.5 0 01-.404.58A7 7 0 1023 16a.5.5 0 011 0 8 8 0 11-9.416-7.874.5.5 0 01.58.404z'
+          fill='currentColor' fill-rule='evenodd' />
+      </svg>
+      
+    </div>
+  </div>
+</div>
+
+
+<div @fadeIn *ngIf="!showLoading" class="kanban-board">
+  <div
+    class="flex flex-col w-screen h-screen overflow-auto text-gray-700 bg-gradient-to-bl from-{{ this.project_setting.projectcolor }}-300 to-{{ this.project_setting.projectcolor }}-400">
+
+    <div class="flex flex-row ...">
+
+      <div class="pl-10 mt-7">
+        <div tippy="Background color">
+          <div class="hover:opacity-80	" [tippy]="tplProjectColor" [className]="'tippyclass'" variation="popper"
+            placement="right"
+            class="cursor-pointer	ml-2 bg-{{ this.project_setting.projectcolor }}-500 rounded-full border-2 border-white flex p-2 relative my-1">
+          </div>
+        </div>
+        <ng-template #tplProjectColor let-hide>
+          <color-github triangle="hide" (onChange)="handleColorChange($event)" [colors]="colorslist"></color-github>
+        </ng-template>
+      </div>
+      <div id="projectname" class="pl-3 mt-6" tippy="Project name">
+        <h1 contenteditable (input)="onNameChange($event)" class="text-2xl font-bold">{{
+          this.project_setting.projectname
+          }}</h1>
+      </div>
+
+
+      <div class="hover:opacity-80 cursor-pointer pl-20 mt-7">
+        <svg (click)="generateDownloadJsonUri()" tippy="Export project" width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="feather feather-download">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+      </div>
+
+
+
+      <div  class="hover:opacity-80 cursor-pointer pl-3 mt-7">
+        <input hidden type="file" #uploader (change)="uploadFile($event)" />
+        <svg id="import-btn" (click)="uploader.click()" tippy="Import project" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="feather feather-upload">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+      </div>
+
+      <div class="hover:opacity-80 cursor-pointer pl-3 mt-7">
+
+        <svg (click)="openHelp()" tippy="Help" width="20" height="20" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="feather feather-help-circle">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+      </div>
+    </div>
+
+
+
+
+
+
+    <div class="flex flex-grow px-10 mt-4 space-x-6 overflow-auto">
+      <!-- Todo -->
+      <div class="flex flex-col w-1/3">
+        <div class="flex items-center flex-shrink-0 h-10 px-2">
+          <span class="block text-sm font-semibold">Todo</span>
+          <span
+            class="flex items-center justify-center w-5 h-5 ml-2 text-sm font-semibold text-indigo-500 bg-white rounded bg-opacity-30">{{
+            tasks.todo.length }}</span>
+          <button id="todo-add-btn" (click)="addTodoTask()"
+            class="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+              </path>
+            </svg>
+          </button>
+        </div>
+        <div class="overlayscroll pr-6 flex flex-col pb-2 overflow-auto h-full"
+          (cdkDropListDropped)="onTaskDrop($event)" cdkDropList #todoList="cdkDropList" [cdkDropListData]="tasks.todo"
+          [cdkDropListConnectedTo]="[doingList, doneList]">
+          <app-kanban-newtask id="newtask-component" *ngIf="isShowingTodoForm" [table]="'todo'"
+            (close)="isShowingTodoForm = false" (onSave)="onSave()"></app-kanban-newtask>
+          <ng-container *ngFor="let task of tasks.todo ; let i=index ;let last = last;">
+            <app-kanban-card class="shadow-lg" (click)="cardClicked(task.id)" [taskId]="task.id" [type]="task.type"
+              [task]="task.task" [updatedAt]="task.updated_at" [bgColor]="task.bgcolor" cdkDrag
+              (cdkDragEnded)="dragEnd($event)" [table]="'todo'" (onDelete)="ngOnInit()">
+            </app-kanban-card>
+          </ng-container>
+
+        </div>
+      </div>
+
+      <!-- doing -->
+      <div class="flex flex-col w-1/3 ">
+        <div class="flex items-center flex-shrink-0 h-10 px-2">
+          <span class="block text-sm font-semibold">Doing</span>
+          <span
+            class="flex items-center justify-center w-5 h-5 ml-2 text-sm font-semibold text-indigo-500 bg-white rounded bg-opacity-30">{{
+            tasks.doing.length }}</span>
+          <button (click)="addDoingTask()"
+            class="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+              </path>
+            </svg>
+          </button>
+        </div>
+        <div class="overlayscroll pr-6 flex flex-col pb-2 overflow-auto h-full"
+          (cdkDropListDropped)="onTaskDrop($event)" cdkDropList #doingList="cdkDropList" [cdkDropListData]="tasks.doing"
+          [cdkDropListConnectedTo]="[todoList, doneList]">
+          <app-kanban-newtask *ngIf="isShowingDoingForm" [table]="'doing'" (close)="isShowingDoingForm = false"
+            (onSave)="onSave()"></app-kanban-newtask>
+
+          <ng-container *ngFor="let task of tasks.doing ; let i=index ;let last = last;">
+            <app-kanban-card class="shadow-lg" (click)="cardClicked(task.id)" [taskId]="task.id" [type]="task.type"
+              [task]="task.task" [updatedAt]="task.updated_at" [bgColor]="task.bgcolor" cdkDrag
+              (cdkDragEnded)="dragEnd($event)" [table]="'doing'" (onDelete)="ngOnInit()">
+            </app-kanban-card>
+
+          </ng-container>
+
+          <div [@fadeIn]
+            *ngIf="tasks.todo.length == 0 && tasks.doing.length == 0 && tasks.done.length == 0 && !isShowingTodoForm && !isShowingDoingForm && !isShowingDoneForm">
+            <div class="grid place-items-center content-center" style="height: 75vh;">
+              <div>
+                <svg height="100" viewBox="0 0 512 512" width="100">
+                  <path
+                    d="m256 0c-141.164062 0-256 114.835938-256 256s114.835938 256 256 256 256-114.835938 256-256-114.835938-256-256-256zm0 0"
+                    class="text-{{ this.project_setting.projectcolor }}-500 fill-current" />
+                  <path
+                    d="m385.75 201.75-138.667969 138.664062c-4.160156 4.160157-9.621093 6.253907-15.082031 6.253907s-10.921875-2.09375-15.082031-6.253907l-69.332031-69.332031c-8.34375-8.339843-8.34375-21.824219 0-30.164062 8.339843-8.34375 21.820312-8.34375 30.164062 0l54.25 54.25 123.585938-123.582031c8.339843-8.34375 21.820312-8.34375 30.164062 0 8.339844 8.339843 8.339844 21.820312 0 30.164062zm0 0"
+                    fill="#fafafa" />
+                </svg>
+              </div>
+              <div class="pt-3 text-center">
+                <h1 class="font-bold text-xl">No tasks here</h1>
+                <p class="text-sm">Ready for some new tasks? Click on "+" button to write them down.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- done -->
+      <div class="flex flex-col w-1/3 ">
+        <div class="flex items-center flex-shrink-0 h-10 px-2">
+          <span class="block text-sm font-semibold">Done</span>
+          <span
+            class="flex items-center justify-center w-5 h-5 ml-2 text-sm font-semibold text-indigo-500 bg-white rounded bg-opacity-30">{{
+            tasks.done.length }}</span>
+          <button (click)="addDoneTask()"
+            class="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+              </path>
+            </svg>
+          </button>
+        </div>
+        <div class="overlayscroll pr-6 flex flex-col pb-2 overflow-auto h-full"
+          (cdkDropListDropped)="onTaskDrop($event)" cdkDropList #doneList="cdkDropList" [cdkDropListData]="tasks.done"
+          [cdkDropListConnectedTo]="[todoList, doingList]">
+          <app-kanban-newtask *ngIf="isShowingDoneForm" [table]="'done'" (close)="isShowingDoneForm = false"
+            (onSave)="onSave()"></app-kanban-newtask>
+
+
+          <ng-container *ngFor="let task of tasks.done ; let i=index ;let last = last;">
+            <app-kanban-card class="shadow-lg" (click)="cardClicked(task.id)" [taskId]="task.id" [type]="task.type"
+              [task]="task.task" [updatedAt]="task.updated_at" [bgColor]="task.bgcolor" cdkDrag
+              (cdkDragEnded)="dragEnd($event)" [table]="'done'" (onDelete)="ngOnInit()">
+            </app-kanban-card>
+
+          </ng-container>
+
+
+
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+  <div id="mr-cat" class="cat" (click)="playMeow()"></div>
+  <audio #audioOption>
+    <source type="audio/mp3">
+  </audio>
+
+</div>

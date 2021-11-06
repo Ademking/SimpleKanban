@@ -1,0 +1,15 @@
+[contenteditable]:focus {
+    outline: 0px solid transparent;
+}
+
+::placeholder {
+    font-style: italic;
+}
+
+textarea {
+    resize: none;
+}
+
+.group:hover .group-hover\:flex {
+    display: flex !important;
+}
